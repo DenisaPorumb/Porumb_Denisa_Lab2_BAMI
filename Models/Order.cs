@@ -10,6 +10,7 @@ namespace Porumb_Denisa_Lab2.Models
         public int? CusstomerID { get; set; }
         public int? BookID { get; set; }
 
+        public DateTime OrderDate { get; set; }
         public Customer? Customer { get; set; }
         public Book?Book { get; set; }
     }
