@@ -22,7 +22,11 @@ namespace Porumb_Denisa_Lab2.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            var porumb_Denisa_Lab2Context = _context.Order.Include(o => o.Book);
+            var porumb_Denisa_Lab2Context = _context.Order
+                   .Include(o => o.Book)
+                   .Include(o => o.Customer) 
+                   .AsNoTracking();
+
             return View(await porumb_Denisa_Lab2Context.ToListAsync());
         }
 
@@ -36,6 +40,7 @@ namespace Porumb_Denisa_Lab2.Controllers
 
             var order = await _context.Order
                 .Include(o => o.Book)
+                .Include(o => o.Customer)
                 .FirstOrDefaultAsync(m => m.OrderID == id);
             if (order == null)
             {
@@ -48,7 +53,8 @@ namespace Porumb_Denisa_Lab2.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
-            ViewData["BookID"] = new SelectList(_context.Book, "ID", "ID");
+            ViewData["BookID"] = new SelectList(_context.Book, "ID", "Title");
+            ViewData["CustomerID"] = new SelectList(_context.Customer, "CustomerID", "Name");
             return View();
         }
 
@@ -57,7 +63,7 @@ namespace Porumb_Denisa_Lab2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderID,CusstomerID,BookID,OrderDate")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderID,CustomerID,BookID,OrderDate")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +71,8 @@ namespace Porumb_Denisa_Lab2.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookID"] = new SelectList(_context.Book, "ID", "ID", order.BookID);
+            ViewData["BookID"] = new SelectList(_context.Book, "ID", "Title", order.BookID);
+            ViewData["CustomerID"] = new SelectList(_context.Customer, "CustomerID", "Name", order.CustomerID);
             return View(order);
         }
 
@@ -82,7 +89,8 @@ namespace Porumb_Denisa_Lab2.Controllers
             {
                 return NotFound();
             }
-            ViewData["BookID"] = new SelectList(_context.Book, "ID", "ID", order.BookID);
+            ViewData["BookID"] = new SelectList(_context.Book, "ID", "Title", order.BookID);
+            ViewData["CustomerID"] = new SelectList(_context.Customer, "CustomerID", "Name", order.CustomerID);
             return View(order);
         }
 
@@ -91,7 +99,7 @@ namespace Porumb_Denisa_Lab2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderID,CusstomerID,BookID,OrderDate")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("OrderID,CustomerID,BookID,OrderDate")] Order order)
         {
             if (id != order.OrderID)
             {
@@ -118,7 +126,8 @@ namespace Porumb_Denisa_Lab2.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["BookID"] = new SelectList(_context.Book, "ID", "ID", order.BookID);
+            ViewData["BookID"] = new SelectList(_context.Book, "ID", "Title", order.BookID);
+            ViewData["CustomerID"] = new SelectList(_context.Customer, "CustomerID", "Name", order.CustomerID);
             return View(order);
         }
 
