@@ -7,5 +7,6 @@
         public decimal Price { get; set; }
         public Author Author { get; set; }
         public Genre Genre { get; set; }
+        public string FullName { get; set; }
     }
 }

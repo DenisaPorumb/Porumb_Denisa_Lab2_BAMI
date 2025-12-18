@@ -24,6 +24,7 @@ namespace Porumb_Denisa_Lab2.Controllers
         {
             ViewData["TitleSortParm"] = String.IsNullOrEmpty(sortOrder) ? "title_desc" : "";
             ViewData["PriceSortParm"] = sortOrder == "Price" ? "price_desc" : "Price";
+            ViewData["AuthorSortParm"] = sortOrder == "Author" ? "author_desc" : "Author";
             ViewData["CurrentFilter"] = searchString;
 
             var books = from b in _context.Book
@@ -33,8 +34,11 @@ namespace Porumb_Denisa_Lab2.Controllers
                             ID = b.ID,
                             Title = b.Title,
                             Price = b.Price,
-                            Author = a
+                            Author = a,
+                            FullName= a.FirstName + " " + a.LastName,
+                            Genre= b.Genre
                         };
+
             if (!String.IsNullOrEmpty(searchString))
             { 
                 books = books.Where(s => s.Title.Contains(searchString)); 
@@ -51,6 +55,12 @@ namespace Porumb_Denisa_Lab2.Controllers
                 case "price_desc":
                     books = books.OrderByDescending(b => b.Price);
                     break;
+                case "Author": 
+                    books = books.OrderBy(b => b.FullName);
+                    break;
+                case "author_desc": 
+                    books = books.OrderByDescending(b => b.FullName);
+                    break;
                 default:
                     books = books.OrderBy(b => b.Title);
                     break;
@@ -62,16 +72,15 @@ namespace Porumb_Denisa_Lab2.Controllers
             public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
+
                 return NotFound();
-            }
 
             var book = await _context.Book
+                .Include(b => b.Genre)
+                .Include(b => b.Author)
                 .Include(s => s.Orders)
                 .ThenInclude(e=> e.Customer)
                 .AsNoTracking()
-                //.Include(b => b.Genre)
-                //.Include(b => b.Author)
                 .FirstOrDefaultAsync(m => m.ID == id);
 
             if (book == null)
